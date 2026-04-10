@@ -2,65 +2,60 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 
-// Middleware
-// Replace app.use(cors()); with this:
+// 1. IMPROVED CORS CONFIGURATION
+// This allows your specific Vercel frontend and local development
 app.use(cors({
     origin: [
         'http://localhost:5173', 
         'https://rentbraker-chi.vercel.app',
-        /\.vercel\.app$/ // This allows all your Vercel preview deployments
+        /\.vercel\.app$/ 
     ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
 
 app.use(express.json());
 
-// Routes
+// 2. DATABASE CONNECTION
+// Connect outside of a function for better performance on Vercel
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+    console.error('❌ ERROR: MONGODB_URI is not defined in .env file');
+} else {
+    mongoose.connect(MONGODB_URI)
+        .then(() => console.log(`✅ Connected to MongoDB: ${mongoose.connection.name}`))
+        .catch(err => console.error('❌ MongoDB Connection Error:', err.message));
+}
+
+// 3. ROUTES
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/machines', require('./routes/machineRoutes'));
 app.use('/api/customers', require('./routes/customerRoutes'));
 app.use('/api/rentals', require('./routes/rentalRoutes'));
 app.use('/api/maintenance', require('./routes/maintenanceRoutes'));
 
-/**
- * Database Connection Logic
- * Priorities: 
- * 1. Use MONGODB_URI from .env (Atlas/Cloud)
- * 2. Fallback to MongoMemoryServer for development/testing
- */
-const startServer = async () => {
-    try {
-        let connectionString = process.env.MONGODB_URI;
+// 4. ROOT ROUTE (To check if backend is alive)
+app.get('/', (req, res) => {
+    res.send('RentBreaker API is running...');
+});
 
-        if (!connectionString) {
-            console.log('⚠️ No MONGODB_URI found in .env. Launching in-memory database...');
-            const { MongoMemoryServer } = require('mongodb-memory-server');
-            const mongoServer = await MongoMemoryServer.create();
-            connectionString = mongoServer.getUri();
-        } else {
-            console.log('🌐 Connecting to MongoDB Atlas...');
-        }
+// 5. GLOBAL ERROR HANDLER
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Internal Server Error', error: err.message });
+});
 
-        // Connect to MongoDB
-        await mongoose.connect(connectionString);
-        
-        console.log(`✅ Connected to MongoDB: ${mongoose.connection.name}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
 
-        const PORT = process.env.PORT || 5000;
-        app.listen(PORT, () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-        });
-
-    } catch (err) {
-        console.error('❌ MongoDB connection error:', err.message);
-        process.exit(1); // Exit process with failure
-    }
-};
-
-startServer();
+module.exports = app; // Required for Vercel
