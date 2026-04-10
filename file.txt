@@ -1,0 +1,120 @@
+Software Requirements Specification (SRS)
+Project Title: Rent Breaker Machine Management System
+Technology: MongoDB, Express.js, React.js, Node.js
+1. Introduction
+1.1 Purpose
+This document describes the functional and non-functional requirements for a Rent Breaker 
+Machine Management System. The system is designed to help owners, staff, and customers 
+manage rental breaker machines efficiently. Key objectives: manage machine availability, 
+book machines, track customers & operators, generate invoices and reports.
+1.2 Scope
+The system will allow:
+- Admin to manage machines, customers, and rentals
+- Staff to assign machines and update rental status
+- Customers to view machine availability and request rentals (optional)
+- Automatic billing calculation and report generation
+Out of scope:
+- Online payment gateway
+- Multi-location management (future enhancement)
+1.3 Definitions
+- Admin / Owner: Full system access
+- Staff / Operator: Limited access to assign machines and record rentals
+- Customer: Requests machine rental
+- Rental: Booking of a machine for a specified duration
+- JWT: JSON Web Token for secure authentication
+2. Overall Description
+2.1 Product Perspective
+Web-based application using MERN stack: Frontend: React.js, Backend: Node.js + Express.js, 
+Database: MongoDB
+2.2 Product Functions
+- Machine management (add, update, delete, status tracking)
+- Customer management
+- Rental booking & status update
+- Billing & payment tracking
+- Maintenance tracking
+- Reports (daily/monthly/revenue)
+2.3 User Classes and Characteristics
+| User Type | Description | Access Level |
+|-----------|-------------|--------------|
+| Admin | Owner | Full access |
+| Staff | Operator | Assign machines, update rental status |
+| Customer | Client | View machines, request rental |
+3. System Architecture
+3.1 Architecture Overview
+Three-tier architecture:
+1. Presentation Layer (React.js frontend)
+2. Application Layer (Express.js + Node.js API)
+3. Data Layer (MongoDB)
+3.2 Deployment Architecture
+Frontend hosted on Netlify/Vercel, Backend hosted on Render/VPS, Database on MongoDB 
+Atlas
+4. Functional Requirements
+4.1 Authentication Module
+- User login/logout
+- Password hashing using bcrypt
+- JWT authentication
+- Role-based access
+4.2 Machine Management Module (Admin Only)
+- Add/Update/Delete machine
+- Track machine status: Available/Rented/Maintenance
+- Fields: Name, Capacity, Rental Price per Day, Location, Status
+4.3 Customer Management Module
+- Add/Update customer information
+- Track rental history
+- Fields: Name, Phone, CNIC, Address
+4.4 Rental Management Module
+- Book machine for customer
+- Auto calculate rental price based on duration
+- Update machine status automatically
+- Rental status: Pending / Active / Completed
+4.5 Billing & Payment Module
+- Auto bill generation
+- Advance payment tracking
+- Remaining balance calculation
+4.6 Maintenance Management Module
+- Record machine maintenance
+- Schedule next maintenance
+- Track maintenance cost
+4.7 Reports Module
+- Daily/monthly rental report
+- Machine utilization report
+- Revenue report
+- Customer rental history
+5. Non-Functional Requirements
+Security: Password hashing, JWT token, Role-based access
+Performance: Response time < 3 seconds, concurrent users supported
+Usability: Clean, user-friendly interface, responsive design
+Reliability: System must not crash under normal load, proper error handling
+6. Database Design
+User Collection: name, email, password, role
+Machine Collection: name, capacity, rentalPricePerDay, status, location
+Customer Collection: name, phone, cnic, address
+Rental Collection: machineId, customerId, startDate, endDate, totalRent, status
+Maintenance Collection: machineId, date, issue, cost
+7. API Endpoints (Sample)
+Authentication: POST /api/auth/register, POST /api/auth/login
+Machines: GET /api/machines, POST /api/machines, PUT /api/machines/:id, DELETE 
+/api/machines/:id
+Customers: GET /api/customers, POST /api/customers, PUT /api/customers/:id, DELETE 
+/api/customers/:id
+Rentals: GET /api/rentals, POST /api/rentals, PUT /api/rentals/:id
+Maintenance: GET /api/maintenance, POST /api/maintenance
+8. User Interface Modules
+Login Page, Dashboard, Machine Management, Customer Management, Rental Booking, 
+Billing & Invoice, Maintenance, Reports
+9. Assumptions & Constraints
+Assumptions:
+- Users have internet access
+- Single location operation
+Constraints:
+- MERN stack only
+- No online payment integration in current version
+10. Future Enhancements
+- Online payment integration
+- Multi-location machine rental
+- PDF invoice generation
+- Advanced dashboard with charts
+11. Conclusion
+The Rent Breaker Machine Management System is designed to streamline machine rental 
+operations. The MERN stack ensures scalability, flexibility, and maintainability, making it 
+suitable for real-world industrial use.
