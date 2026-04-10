@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Customers = () => {
     const [customers, setCustomers] = useState([]);
     const [formData, setFormData] = useState({ name: '', phone: '', cnic: '', address: '' });
@@ -11,7 +13,7 @@ const Customers = () => {
 
     const fetchCustomers = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/customers');
+            const res = await axios.get(`${API_URL}/api/customers`);
             setCustomers(res.data);
         } catch (err) {
             console.error(err);
@@ -21,7 +23,7 @@ const Customers = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/customers', formData);
+            await axios.post(`${API_URL}/api/customers`, formData);
             setFormData({ name: '', phone: '', cnic: '', address: '' });
             fetchCustomers();
         } catch (err) {

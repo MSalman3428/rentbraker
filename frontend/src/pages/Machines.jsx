@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Machines = () => {
     const [machines, setMachines] = useState([]);
     const [formData, setFormData] = useState({ name: '', capacity: '', rentalPricePerDay: '', location: '' });
@@ -11,7 +13,7 @@ const Machines = () => {
 
     const fetchMachines = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/machines');
+            const res = await axios.get(`${API_URL}/api/machines`);
             setMachines(res.data);
         } catch (err) {
             console.error(err);
@@ -21,7 +23,7 @@ const Machines = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/machines', formData);
+            await axios.post(`${API_URL}/api/machines`, formData);
             setFormData({ name: '', capacity: '', rentalPricePerDay: '', location: '' });
             fetchMachines();
         } catch (err) {

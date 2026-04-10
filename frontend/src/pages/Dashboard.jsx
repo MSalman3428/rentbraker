@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Dashboard = () => {
     const [stats, setStats] = useState({ machines: 0, customers: 0, rentals: 0 });
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const machinesRes = await axios.get('http://localhost:5000/api/machines');
+                const machinesRes = await axios.get(`${API_URL}/api/machines`);
                 const statsData = {
                     machines: machinesRes.data.length,
                     activeMachines: machinesRes.data.filter(m => m.status === 'Rented').length,

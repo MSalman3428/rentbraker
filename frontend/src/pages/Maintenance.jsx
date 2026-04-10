@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Maintenance = () => {
     const [records, setRecords] = useState([]);
     const [machines, setMachines] = useState([]);
@@ -13,8 +15,8 @@ const Maintenance = () => {
     const fetchData = async () => {
         try {
             const [recordsRes, machinesRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/maintenance'),
-                axios.get('http://localhost:5000/api/machines')
+                axios.get(`${API_URL}/api/maintenance`),
+                axios.get(`${API_URL}/api/machines`)
             ]);
             setRecords(recordsRes.data);
             setMachines(machinesRes.data);
@@ -26,7 +28,7 @@ const Maintenance = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/maintenance', formData);
+            await axios.post(`${API_URL}/api/maintenance`, formData);
             setFormData({ machineId: '', date: '', issue: '', cost: '' });
             fetchData();
         } catch (err) {
