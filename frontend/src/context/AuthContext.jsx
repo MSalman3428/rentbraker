@@ -3,6 +3,9 @@ import axios from "axios";
 
 export const AuthContext = createContext();
 
+// Get the API URL from environment variables
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,23 +22,23 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      // FIXED: Use the API_URL variable instead of hardcoded localhost
+      const res = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
       });
+      
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      axios.defaults.headers.common["Authorization"] =
-        `Bearer ${res.data.token}`;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+      
       setUser(res.data.user);
       return { success: true };
     } catch (error) {
-      console.log("LOGIN ERROR FULL:", error);
-      console.log("LOGIN ERROR RESPONSE:", error.response);
-
+      console.log("LOGIN ERROR:", error.message);
       return {
         success: false,
-        message: error.response?.data?.message || error.message,
+        message: error.response?.data?.message || "Server connection failed",
       };
     }
   };
