@@ -9,7 +9,16 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+// Replace app.use(cors()); with this:
+app.use(cors({
+    origin: [
+        'http://localhost:5173', 
+        'https://rentbraker-chi.vercel.app',
+        /\.vercel\.app$/ // This allows all your Vercel preview deployments
+    ],
+    credentials: true
+}));
+
 app.use(express.json());
 
 // Routes
