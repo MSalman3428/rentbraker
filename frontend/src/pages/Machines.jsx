@@ -7,18 +7,19 @@ const Machines = () => {
     const [machines, setMachines] = useState([]);
     const [formData, setFormData] = useState({ name: '', capacity: '', rentalPricePerDay: '', location: '' });
 
-    useEffect(() => {
-        fetchMachines();
-    }, []);
-
-    const fetchMachines = async () => {
+    async function fetchMachines() {
         try {
             const res = await axios.get(`${API_URL}/api/machines`);
             setMachines(res.data);
         } catch (err) {
             console.error(err);
         }
-    };
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchMachines();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

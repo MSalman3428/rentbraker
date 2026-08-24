@@ -1,24 +1,23 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-export const AuthContext = createContext();
+import { AuthContext } from './AuthContext.js';
 
 // Get the API URL from environment variables
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [loading] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
+    if (user && token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
-    setLoading(false);
-  }, []);
+  }, [user]);
 
   const login = async (email, password) => {
     try {

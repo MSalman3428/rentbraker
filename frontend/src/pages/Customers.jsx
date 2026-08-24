@@ -7,18 +7,19 @@ const Customers = () => {
     const [customers, setCustomers] = useState([]);
     const [formData, setFormData] = useState({ name: '', phone: '', cnic: '', address: '' });
 
-    useEffect(() => {
-        fetchCustomers();
-    }, []);
-
-    const fetchCustomers = async () => {
+    async function fetchCustomers() {
         try {
             const res = await axios.get(`${API_URL}/api/customers`);
             setCustomers(res.data);
         } catch (err) {
             console.error(err);
         }
-    };
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchCustomers();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

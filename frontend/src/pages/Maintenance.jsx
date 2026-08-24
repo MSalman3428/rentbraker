@@ -8,11 +8,7 @@ const Maintenance = () => {
     const [machines, setMachines] = useState([]);
     const [formData, setFormData] = useState({ machineId: '', date: '', issue: '', cost: '' });
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    const fetchData = async () => {
+    async function fetchData() {
         try {
             const [recordsRes, machinesRes] = await Promise.all([
                 axios.get(`${API_URL}/api/maintenance`),
@@ -23,7 +19,12 @@ const Maintenance = () => {
         } catch (err) {
             console.error(err);
         }
-    };
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchData();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

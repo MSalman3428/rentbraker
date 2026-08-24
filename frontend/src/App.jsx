@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
-import { LayoutDashboard, Users, UserCog, CalendarClock, Settings2, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, UserCog, CalendarClock, Settings2, LogOut, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -26,6 +27,7 @@ const ProtectedRoute = ({ children, roles }) => {
 const Sidebar = () => {
     const { logout } = useContext(AuthContext);
     const location = useLocation();
+    const [open, setOpen] = useState(false);
     
     const navItems = [
         { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
@@ -36,18 +38,25 @@ const Sidebar = () => {
     ];
 
     return (
-        <div className="sidebar">
-            <h2 style={{ padding: '0 24px', marginBottom: '32px', color: 'var(--primary)' }}>RentBreaker</h2>
+        <>
+        <button className="mobile-menu" onClick={() => setOpen(!open)} aria-label="Toggle navigation">
+            {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
+        <div className={`sidebar ${open ? 'sidebar-open' : ''}`}>
+            <div className="brand"><span className="brand-mark">R</span><span>RentBreaker</span></div>
+            <p className="sidebar-kicker">Operations desk</p>
             {navItems.map(item => (
-                <Link key={item.path} to={item.path} className={location.pathname === item.path ? 'active' : ''}>
+                <Link key={item.path} to={item.path} onClick={() => setOpen(false)} className={location.pathname === item.path ? 'active' : ''}>
                     {item.icon} {item.label}
                 </Link>
             ))}
-            <div style={{ flex: 1 }}></div>
+            <div className="sidebar-spacer"></div>
             <a href="#" onClick={(e) => { e.preventDefault(); logout(); }}>
                 <LogOut size={20} /> Logout
             </a>
         </div>
+        {open && <button className="sidebar-backdrop" onClick={() => setOpen(false)} aria-label="Close navigation" />}
+        </>
     );
 };
 
@@ -55,6 +64,7 @@ const AppLayout = ({ children }) => (
     <div className="app-container">
         <Sidebar />
         <div className="main-content">
+            <div className="topbar"><span className="topbar-date">RENTAL OPERATIONS / 2026</span><span className="status-dot">System online</span></div>
             {children}
         </div>
     </div>

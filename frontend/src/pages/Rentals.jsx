@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Rentals = () => {
     const [rentals, setRentals] = useState([]);
     const [machines, setMachines] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [formData, setFormData] = useState({ machineId: '', customerId: '', startDate: '', endDate: '', totalRent: '', advancePayment: '', remainingBalance: '' });
-
-    useEffect(() => {
-        fetchData();
-    }, []);
 
     // Auto-calculate total rent based on dates and machine price
     useEffect(() => {
@@ -25,6 +23,7 @@ const Rentals = () => {
                 const advance = parseFloat(formData.advancePayment) || 0;
                 const remaining = total - advance;
 
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setFormData(prev => ({ 
                     ...prev, 
                     totalRent: total,
@@ -32,14 +31,14 @@ const Rentals = () => {
                 }));
             }
         }
-    }, [formData.machineId, formData.startDate, formData.endDate, formData.advancePayment]);
+    }, [formData.machineId, formData.startDate, formData.endDate, formData.advancePayment, machines]);
 
-    const fetchData = async () => {
+    async function fetchData() {
         try {
             const [rentalsRes, machinesRes, custRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/rentals'),
-                axios.get('http://localhost:5000/api/machines'),
-                axios.get('http://localhost:5000/api/customers')
+                axios.get(`${API_URL}/api/rentals`),
+                axios.get(`${API_URL}/api/machines`),
+                axios.get(`${API_URL}/api/customers`)
             ]);
             setRentals(rentalsRes.data);
             setMachines(machinesRes.data.filter(m => m.status === 'Available'));
@@ -47,12 +46,17 @@ const Rentals = () => {
         } catch (err) {
             console.error(err);
         }
-    };
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchData();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/rentals', formData);
+            await axios.post(`${API_URL}/api/rentals`, formData);
             setFormData({ machineId: '', customerId: '', startDate: '', endDate: '', totalRent: '', advancePayment: '', remainingBalance: '' });
             fetchData();
         } catch (err) {
@@ -62,7 +66,7 @@ const Rentals = () => {
 
     const completeRental = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/rentals/${id}`, { status: 'Completed' });
+            await axios.put(`${API_URL}/api/rentals/${id}`, { status: 'Completed' });
             fetchData();
         } catch (err) {
             console.error(err);
